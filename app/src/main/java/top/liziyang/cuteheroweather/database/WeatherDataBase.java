@@ -15,26 +15,26 @@ import top.liziyang.cuteheroweather.model.Province;
 /**
  * Created by stefan on 15/5/27.
  */
-public class WeatherDateBase {
+public class WeatherDataBase {
 
     public static final String DB_NAME = "cutehero_weather";
     public static final int DB_VERSION = 1;
 
     private SQLiteDatabase sqLiteDatabase;
-    private static WeatherDateBase weatherDateBase;
+    private static WeatherDataBase weatherDataBase;
 
-    private WeatherDateBase(Context context) {
+    private WeatherDataBase(Context context) {
 
         WeatherSQLiteOpenHelper weatherSQLiteOpenHelper = new WeatherSQLiteOpenHelper(context, DB_NAME, null, DB_VERSION);
         sqLiteDatabase = weatherSQLiteOpenHelper.getWritableDatabase();
     }
 
-    public synchronized static WeatherDateBase getInstance(Context context) {
-        if (weatherDateBase == null) {
-            weatherDateBase = new WeatherDateBase(context);
+    public synchronized static WeatherDataBase getInstance(Context context) {
+        if (weatherDataBase == null) {
+            weatherDataBase = new WeatherDataBase(context);
         }
 
-        return weatherDateBase;
+        return weatherDataBase;
     }
 
     /**

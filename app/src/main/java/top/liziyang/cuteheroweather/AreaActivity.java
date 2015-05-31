@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,6 +25,8 @@ import top.liziyang.cuteheroweather.util.Utility;
 
 public class AreaActivity extends Activity {
 
+    public static final String TAG = "Stefan";
+
     private List<Province> listProvinces;
     private List<City> listCities;
     private List<County> listCounties;
@@ -43,6 +46,9 @@ public class AreaActivity extends Activity {
      * 标识当前listView显示的什么列表，Province、City or County
      */
     private int currentLEVEL;
+    private Province selectedProvince;
+    private City selectedCity;
+    private County selectedCounty;
 
     private ProgressDialog progressDialog;
 
@@ -64,15 +70,30 @@ public class AreaActivity extends Activity {
         listViewArea.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //
+                if (currentLEVEL == LEVEL_PROVINCE) {
+                    // province --> city
+                    selectedProvince = listProvinces.get(position);
+                    Log.d(TAG, "position : " + position + "  , id : " + id + ",     provinceId : " + selectedProvince.getId());
+                    queryCities();
+                } else if (currentLEVEL == LEVEL_CITY) {
+                    // city --> county
+                    selectedCity = listCities.get(position);
+                    queryCounties();
+                } else if (currentLEVEL == LEVEL_COUNTY) {
+                    // county --> display
+                }
             }
         });
+
+        //selectedProvince = new Province();
+        //selectedCity = new City();
+        //selectedCounty = new County();
 
         queryProvinces();
     }
 
     /**
-     * 获取Province信息，存储到 listString 里面，优先从数据库获取，如果数据库没有就从网络获取
+     * 获取Province信息，存储到 listString，优先从数据库获取，如果数据库没有就从网络获取
      */
     private void queryProvinces() {
         listProvinces = weatherDataBase.loadProvinces();
@@ -80,14 +101,55 @@ public class AreaActivity extends Activity {
             // 数据库中有数据
             for (Province province : listProvinces) {
                 listString.add(province.getProvinceName());
-                adapter.notifyDataSetChanged();
-                listViewArea.setSelection(0);
-                textViewArea.setText("中国");
-
-                currentLEVEL = LEVEL_PROVINCE;
             }
+            adapter.notifyDataSetChanged();
+            listViewArea.setSelection(0);
+            textViewArea.setText("中国");
+
+            currentLEVEL = LEVEL_PROVINCE;
         } else {
             queryFromServer(null, "province");
+        }
+    }
+
+    /**
+     * 查询City信息，存储到 listString
+     */
+    private void queryCities() {
+        // 优先查询数据库
+        Log.d(TAG, "sel province id : " + selectedProvince.getId());
+        listCities = weatherDataBase.loadCities(selectedProvince.getId());
+        if (listCities.size() > 0) {
+            listString.clear();
+            for (City city : listCities) {
+                listString.add(city.getCityName());
+            }
+            adapter.notifyDataSetChanged();
+            listViewArea.setSelection(0);
+            textViewArea.setText(selectedProvince.getProvinceName());
+
+            currentLEVEL = LEVEL_CITY;
+        } else {
+            // 数据库没有，从网络获取
+            queryFromServer(selectedProvince.getProvinceCode(), "city");
+        }
+    }
+
+    private void queryCounties() {
+        // 优先查询数据库
+        listCounties = weatherDataBase.loadCounties(selectedCity.getId());
+        if (listCounties.size() > 0) {
+            listString.clear();
+            for (County county : listCounties) {
+                listString.add(county.getCountyName());
+            }
+            adapter.notifyDataSetChanged();
+            listViewArea.setSelection(0);
+            textViewArea.setText(selectedCity.getCityName());
+
+            currentLEVEL = LEVEL_COUNTY;
+        } else {
+            queryFromServer(selectedCity.getCityCode(), "county");
         }
     }
 
@@ -116,8 +178,10 @@ public class AreaActivity extends Activity {
                         result = Utility.HandleProvinceResponse(weatherDataBase, response);
                         break;
                     case "city":
+                        result = Utility.HandleCityResponse(weatherDataBase, response, selectedProvince.getId());
                         break;
                     case "county":
+                        result = Utility.HandleCountyResponse(weatherDataBase, response, selectedCity.getId());
                         break;
                 }
                 if (result) {
@@ -125,7 +189,17 @@ public class AreaActivity extends Activity {
                         @Override
                         public void run() {
                             hideLoadingDialog();
-                            queryProvinces();
+                            switch (queryType) {
+                                case "province":
+                                    queryProvinces();
+                                    break;
+                                case "city":
+                                    queryCities();
+                                    break;
+                                case "county":
+                                    queryCounties();
+                                    break;
+                            }
                         }
                     });
                 }

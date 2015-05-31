@@ -2,7 +2,10 @@ package top.liziyang.cuteheroweather;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -56,6 +59,15 @@ public class AreaActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(AreaActivity.this);
+        if (sharedPreferences.getBoolean("city_selected", false)) {
+            // 若存在本地天气，直接显示
+            Intent intent = new Intent(AreaActivity.this, WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         setContentView(R.layout.area);
 
         textViewArea = (TextView) findViewById(R.id.textview_area);
@@ -81,13 +93,14 @@ public class AreaActivity extends Activity {
                     queryCounties();
                 } else if (currentLEVEL == LEVEL_COUNTY) {
                     // county --> display
+                    String countyCode = listCounties.get(position).getCountyCode();
+                    Intent intent = new Intent(AreaActivity.this, WeatherActivity.class);
+                    intent.putExtra("county_code", countyCode);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
-
-        //selectedProvince = new Province();
-        //selectedCity = new City();
-        //selectedCounty = new County();
 
         queryProvinces();
     }

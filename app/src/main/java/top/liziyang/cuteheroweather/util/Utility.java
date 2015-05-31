@@ -1,6 +1,15 @@
 package top.liziyang.cuteheroweather.util;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
+
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import top.liziyang.cuteheroweather.database.WeatherDataBase;
 import top.liziyang.cuteheroweather.model.City;
@@ -95,5 +104,54 @@ public class Utility {
         } else {
             return false;
         }
+    }
+
+    /**
+     * 解析JSON数据，格式如下：
+     * {
+     *     "weatherinfo":
+     *     {
+     *         "city":"冠县",
+     *         "cityid":"101121702",
+     *         "temp1":"13℃",
+     *         "temp2":"5℃",
+     *         "weather":"阴转多云",
+     *         "img1":"d2.gif",
+     *         "img2":"n1.gif",
+     *         "ptime":"08:00"
+     *     }
+     * }
+     *
+     * @param context  Context对象
+     * @param response JSON数据
+     */
+    public static void handleWeatherJsonResponse(Context context, String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
+            String cityName = weatherInfo.getString("city");
+            String lowTemperature = weatherInfo.getString("temp2");
+            String highTemperature = weatherInfo.getString("temp1");
+            String weatherDescription = weatherInfo.getString("weather");
+            String updateTime = weatherInfo.getString("ptime");
+            // 保存到 SharedPreference
+            saveWeatherInfo(context, cityName, lowTemperature, highTemperature, weatherDescription, updateTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveWeatherInfo(Context context, String cityName, String lowTemperature, String highTemperature, String weatherDescription, String updateTime) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年M月d日", Locale.CHINA);
+
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.putBoolean("city_selected", true);
+        editor.putString("city_name", cityName);
+        editor.putString("low_temperature", lowTemperature);
+        editor.putString("high_temperature", highTemperature);
+        editor.putString("weather_description", weatherDescription);
+        editor.putString("update_time", updateTime);
+        editor.putString("current_date", simpleDateFormat.format(new Date()));
+        editor.commit();
     }
 }

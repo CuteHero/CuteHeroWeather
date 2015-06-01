@@ -6,21 +6,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/textview_weather_city"
-        android:text="城市"
-        android:textSize="36dp"
-        android:textColor="#ffff"
-        android:layout_margin="10dp"
-        android:gravity="center"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp" />
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageview_back"
+            android:src="@drawable/image_back"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="60dp" />
+
+        <TextView
+            android:id="@+id/textview_weather_city"
+            android:layout_weight="9"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="城市"
+            android:textColor="#f000"
+            android:textSize="36dp" />
+        <ImageView
+            android:id="@+id/imageview_update_weather"
+            android:src="@drawable/image_update_weather"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="60dp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textview_update_time"
         android:text="发布时间"
         android:textSize="18dp"
-        android:textColor="#ffff"
+        android:textColor="#f000"
         android:layout_margin="10dp"
         android:gravity="center_vertical|right"
         android:layout_width="match_parent"
@@ -32,36 +53,76 @@
 
         <LinearLayout
             android:orientation="vertical"
+            android:layout_marginBottom="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
 
             <TextView
-                android:id="@+id/textview_date"
-                android:text="日期"
-                android:textSize="22dp"
-                android:textColor="#ffff"
+                android:id="@+id/textview_current_temperature"
+                android:text="当前温度"
+                android:textSize="60dp"
+                android:textColor="#f000"
+                android:layout_gravity="center_horizontal"
                 android:layout_margin="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
-                android:id="@+id/textview_weather"
-                android:text="天气实况"
-                android:textSize="46dp"
-                android:textColor="#ffff"
-                android:layout_margin="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_temperature"
-                android:text="温度范围"
+                android:id="@+id/textview_shidu"
+                android:text="湿度"
                 android:textSize="32dp"
-                android:textColor="#ffff"
+                android:textColor="#f000"
+                android:layout_margin="10dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/textview_feng"
+                android:text="刮风情况"
+                android:textSize="32dp"
+                android:textColor="#f000"
                 android:layout_margin="10dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
+
+        <FrameLayout
+            android:layout_gravity="bottom"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textview_sunset"
+                android:text="日落时间"
+                android:textSize="18dp"
+                android:textColor="#f000"
+                android:layout_gravity="right|center_vertical"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/textview_date"
+                android:text="日期"
+                android:textSize="22dp"
+                android:textColor="#f000"
+                android:layout_gravity="center_horizontal|top"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textview_sunrise"
+                android:text="日出时间"
+                android:textSize="18dp"
+                android:textColor="#f000"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_gravity="left" />
+        </FrameLayout>
     </FrameLayout>
 
 </LinearLayout>

@@ -9,7 +9,7 @@
         android:id="@+id/textview_area"
         android:text="地区"
         android:textSize="36dp"
-        android:textColor="#ffff"
+        android:textColor="#f000"
         android:gravity="center"
         android:background="#ff1e90ff"
         android:layout_width="match_parent"

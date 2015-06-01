@@ -51,17 +51,20 @@ public class AreaActivity extends Activity {
     private int currentLEVEL;
     private Province selectedProvince;
     private City selectedCity;
-    private County selectedCounty;
+    //private County selectedCounty;
 
     private ProgressDialog progressDialog;
 
+    private boolean isFromWeatherActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        isFromWeatherActivity = getIntent().getBooleanExtra("is_from_weather_activity", false);
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(AreaActivity.this);
-        if (sharedPreferences.getBoolean("city_selected", false)) {
+        if (sharedPreferences.getBoolean("city_selected", false) && (!isFromWeatherActivity)) {
             // 若存在本地天气，直接显示
             Intent intent = new Intent(AreaActivity.this, WeatherActivity.class);
             startActivity(intent);

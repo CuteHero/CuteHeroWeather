@@ -5,8 +5,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
-import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -106,51 +108,83 @@ public class Utility {
         }
     }
 
-    /**
-     * 解析JSON数据，格式如下：
-     * {
-     *     "weatherinfo":
-     *     {
-     *         "city":"冠县",
-     *         "cityid":"101121702",
-     *         "temp1":"13℃",
-     *         "temp2":"5℃",
-     *         "weather":"阴转多云",
-     *         "img1":"d2.gif",
-     *         "img2":"n1.gif",
-     *         "ptime":"08:00"
-     *     }
-     * }
-     *
-     * @param context  Context对象
-     * @param response JSON数据
-     */
-    public static void handleWeatherJsonResponse(Context context, String response) {
+    public static void handleWeatherXmlResponse(Context context, String response, String countyCode) {
+        String cityName = "";
+        String cityId = countyCode;
+        String updateTime = "";
+        String currentTemperature = "";
+        String fengli = "";
+        String fengxiang = "";
+        String shidu = "";
+        String sunrise = "";
+        String sunset = "";
+
         try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
-            String cityName = weatherInfo.getString("city");
-            String lowTemperature = weatherInfo.getString("temp2");
-            String highTemperature = weatherInfo.getString("temp1");
-            String weatherDescription = weatherInfo.getString("weather");
-            String updateTime = weatherInfo.getString("ptime");
-            // 保存到 SharedPreference
-            saveWeatherInfo(context, cityName, lowTemperature, highTemperature, weatherDescription, updateTime);
+            XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParser xmlPullParser = xmlPullParserFactory.newPullParser();
+            xmlPullParser.setInput(new StringReader(response));
+            int eventType = xmlPullParser.getEventType();
+
+
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                String nodeName = xmlPullParser.getName();
+                switch (eventType) {
+                    case XmlPullParser.START_TAG:
+                        switch (nodeName) {
+                            case "city":
+                                cityName = xmlPullParser.nextText();
+                                break;
+                            case "updatetime":
+                                updateTime = xmlPullParser.nextText();
+                                break;
+                            case "wendu":
+                                currentTemperature = xmlPullParser.nextText();
+                                break;
+                            case "fengli":
+                                fengli = xmlPullParser.nextText();
+                                break;
+                            case "shidu":
+                                shidu = xmlPullParser.nextText();
+                                break;
+                            case "fengxiang":
+                                fengxiang = xmlPullParser.nextText();
+                                break;
+                            case "sunrise_1":
+                                sunrise = xmlPullParser.nextText();
+                                break;
+                            case "sunset_1":
+                                sunset = xmlPullParser.nextText();
+                                break;
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        break;
+                }
+                eventType = xmlPullParser.next();
+            }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        saveWeatherInfo(context, cityName, cityId, updateTime, currentTemperature, fengli, fengxiang, shidu, sunrise, sunset);
     }
 
-    public static void saveWeatherInfo(Context context, String cityName, String lowTemperature, String highTemperature, String weatherDescription, String updateTime) {
+    public static void saveWeatherInfo(Context context, String cityName, String cityId, String updateTime, String currentTemperature, String fengli, String fengxiang, String shidu, String sunrise, String sunset) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年M月d日", Locale.CHINA);
 
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("city_selected", true);
         editor.putString("city_name", cityName);
-        editor.putString("low_temperature", lowTemperature);
-        editor.putString("high_temperature", highTemperature);
-        editor.putString("weather_description", weatherDescription);
+        editor.putString("city_id", cityId);
+        editor.putString("current_temperature", currentTemperature);
         editor.putString("update_time", updateTime);
+        editor.putString("feng_li", fengli);
+        editor.putString("feng_xiang", fengxiang);
+        editor.putString("shi_du", shidu);
+        editor.putString("sun_rise", sunrise);
+        editor.putString("sun_set", sunset);
         editor.putString("current_date", simpleDateFormat.format(new Date()));
         editor.commit();
     }

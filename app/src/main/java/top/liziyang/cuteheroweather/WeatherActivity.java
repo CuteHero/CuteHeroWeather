@@ -133,5 +133,8 @@ public class WeatherActivity extends Activity {
         textViewSunrise.setText("日出 " + sharedPreferences.getString("sun_rise", "--:--"));
         textViewCurrentDate.setText(sharedPreferences.getString("current_date", "----年--月--日"));
         textViewSunset.setText("日落 " + sharedPreferences.getString("sun_set", "--:--"));
+
+        Intent intent = new Intent(this, AutoUpdateWeatherService.class);
+        startService(intent);
     }
 }

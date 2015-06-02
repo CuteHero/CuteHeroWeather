@@ -163,7 +163,6 @@ public class Utility {
                 eventType = xmlPullParser.next();
             }
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
